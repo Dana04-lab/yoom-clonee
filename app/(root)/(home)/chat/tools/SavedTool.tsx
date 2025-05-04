@@ -13,7 +13,17 @@ interface MessageItem {
   text: string;
 }
 
-const SavedTools: React.FC = () => {
+interface SavedToolsProps {
+  savedItems: string[];
+  setSavedItems: React.Dispatch<React.SetStateAction<string[]>>;
+  setActiveTool: (val: string | null) => void;
+}
+
+const SavedTools: React.FC<SavedToolsProps> = ({
+  savedItems,
+  setSavedItems,
+  setActiveTool,
+}) => {
   const { user } = useAuth();
   const userId = user?.uid || 'guest';
 
@@ -119,7 +129,10 @@ const SavedTools: React.FC = () => {
 
       {filePreview && (
         <div className="mb-2 text-sm text-gray-800">
-          Таңдалған {filePreview.type === 'image' ? 'сурет' : 'файл'}: <a href={filePreview.url} target="_blank" rel="noreferrer" className="text-blue-600 underline">{filePreview.name}</a>
+          Таңдалған {filePreview.type === 'image' ? 'сурет' : 'файл'}:{' '}
+          <a href={filePreview.url} target="_blank" rel="noreferrer" className="text-blue-600 underline">
+            {filePreview.name}
+          </a>
         </div>
       )}
 
@@ -153,20 +166,14 @@ const SavedTools: React.FC = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button
-          onClick={handleSendText}
-          className="px-5 py-3 bg-blue-600 text-white rounded-md"
-        >
+        <button onClick={handleSendText} className="px-5 py-3 bg-blue-600 text-white rounded-md">
           Жіберу
         </button>
       </div>
 
       <div className="space-y-4">
         {messages.map((item) => (
-          <div
-            key={item.id}
-            className="relative group border p-3 rounded-md bg-gray-100 hover:bg-gray-50"
-          >
+          <div key={item.id} className="relative group border p-3 rounded-md bg-gray-100 hover:bg-gray-50">
             <p className="text-black whitespace-pre-line">{item.text}</p>
             <button
               onClick={() => setDropdownOpenId(dropdownOpenId === item.id ? null : item.id)}
