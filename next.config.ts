@@ -1,12 +1,11 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     domains: ["lh3.googleusercontent.com"],
   },
   eslint: {
-    ignoreDuringBuilds: true, // 👈 Vercel build сәтті өтуі үшін ESLint қателерін өткізіп жібереміз
+    ignoreDuringBuilds: true, // ✅ ESLint қатесін өткізіп жібереді
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
