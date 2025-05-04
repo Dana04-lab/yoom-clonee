@@ -20,7 +20,7 @@ export const useGetCalls = () => {
         const { calls } = await client.queryCalls({
           sort: [{ field: 'starts_at', direction: -1 }],
           filter_conditions: {
-            starts_at: { $exists: true },
+            // Stream Video API тек осы өрістерді таниды
             $or: [
               { 'created_by.id': user.uid },
               { members: { $in: [user.uid] } },

@@ -10,6 +10,8 @@ import {
   useCallStateHooks,
 } from '@stream-io/video-react-sdk';
 import React, { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { LayoutList, Users } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,24 +19,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LayoutList, Users } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import Loader from './Loader';
 import EndCallButton from './EndCallButton';
+import MeetingSetup from './MeetingSetup'; // ✅ Қосылды
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
 const MeetingRoom = () => {
   const searchParams = useSearchParams();
   const isPersonalRoom = searchParams.get('personal');
+  const router = useRouter();
+
   const [layout, setLayout] = useState<CallLayoutType>('speaker-left');
   const [showParticipants, setShowParticipants] = useState(false);
-  const router = useRouter();
+  const [isSetupComplete, setIsSetupComplete] = useState(false); // ✅ Жаңа күй
 
   const { useCallCallingState } = useCallStateHooks();
   const callingState = useCallCallingState();
 
-  if (callingState !== CallingState.JOINED) return <Loader />;
+  if (callingState !== CallingState.JOINED && !isSetupComplete) {
+    // 🔁 Егер қолданушы кірмеген болса және әлі "setup" жасалмаған болса
+    return <MeetingSetup setIsSetupComplete={setIsSetupComplete} />;
+  }
 
   const CallLayout = () => {
     switch (layout) {
@@ -65,23 +71,18 @@ const MeetingRoom = () => {
         <CallControls onLeave={() => router.push('/')} />
 
         <DropdownMenu>
-          <div className="flex items-center">
-            <DropdownMenuTrigger
-              className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]"
-            >
-              <LayoutList size={20} className="text-white" />
-            </DropdownMenuTrigger>
-          </div>
+          <DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
+            <LayoutList size={20} className="text-white" />
+          </DropdownMenuTrigger>
 
           <DropdownMenuContent className="border-dark-1 bg-[#1C1F2E] text-white">
             {[
-              { label: 'Тор', value: 'grid' },
-              { label: 'Динамик-Солға', value: 'speaker-left' },
-              { label: 'Динамик-Оңға', value: 'speaker-right' },
-            ].map(({ label, value }, index) => (
-              <div key={index}>
+              ['Тор', 'grid'],
+              ['Динамик-Солға', 'speaker-left'],
+              ['Динамик-Оңға', 'speaker-right'],
+            ].map(([label, value]) => (
+              <div key={value}>
                 <DropdownMenuItem
-                  className="cursor-pointer"
                   onClick={() => setLayout(value as CallLayoutType)}
                 >
                   {label}
